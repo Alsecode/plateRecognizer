@@ -1,0 +1,21 @@
+@use './styles/reset.scss';
+
+#app {
+  font-family: 'Geologica', Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: variables.$body-text;
+  min-height: 100vh;
+}
+
+.container {
+  background-color: #f0f0f0;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.title {
+  color: #3498db;
+  font-size: 2rem;
+}
