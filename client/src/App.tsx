@@ -5,6 +5,8 @@ import ButtonCommon from './components/ButtonCommon/ButtonCommon';
 import logo from './img/logo.png';
 import PlateAnswer from './components/PlateAnswer/PlateAnswer';
 
+const SERVER_URL = 'http://localhost:5000';
+
 interface ResponseData {
   results: {
     plate: string,
@@ -57,7 +59,7 @@ const App = () => {
     formData.append('file', file);
 
     try {
-      const res = await fetch('http://localhost:5000/api/upload', {
+      const res = await fetch(`${SERVER_URL}/api/upload`, {
         method: 'POST',
         body: formData,
       });
