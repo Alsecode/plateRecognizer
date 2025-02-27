@@ -5,7 +5,7 @@ import ButtonCommon from './components/ButtonCommon/ButtonCommon';
 import logo from './img/logo.png';
 import PlateAnswer from './components/PlateAnswer/PlateAnswer';
 
-const SERVER_URL = 'http://localhost:5000';
+const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:5000';
 
 interface ResponseData {
   results: {
