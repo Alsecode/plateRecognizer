@@ -1,0 +1,53 @@
+@use '../../styles/variables.scss';
+
+.dropZone {
+  border: 2px dashed variables.$primary;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  position: relative;
+
+  &--active {
+    background-color: variables.$secondary;
+  }
+}
+
+.dropZone:hover {
+  background-color: variables.$secondary;
+}
+
+.previewImage {
+  width: fit-content;
+  max-width: 90%;
+  max-height: 600px;
+  margin-top: 10px;
+  border: 1px solid variables.$secondary-text;
+  border-radius: 8px;
+
+  @media screen and (max-width: 800px) {
+    max-width: 100%;
+  }
+}
+
+.text {
+  font-size: 18px;
+  font-weight: 500;
+
+  @media screen and (max-width: 551px) {
+    font-size: 16px;
+  }
+
+  &--upload {
+    color: variables.$primary;
+  }
+
+  &--error {
+    color: variables.$error;
+  }
+}
+
+.error-margin {
+  margin-top: 10px;
+}

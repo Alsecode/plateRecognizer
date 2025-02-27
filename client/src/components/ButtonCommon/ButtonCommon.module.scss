@@ -1,0 +1,49 @@
+@use '../../styles/variables.scss';
+
+.button {
+  position: relative;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 20px;
+  cursor: pointer;
+  border: none;
+  border-radius: 12px;
+  outline: none;
+  color: variables.$white;
+
+  background-color: variables.$primary;
+  transition: all 0.3s ease-out;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not([disabled]):hover {
+    background-color: variables.$primaryPale;
+  }
+
+  &__spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 3px solid variables.$white;;
+    border-top: 3px solid transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
