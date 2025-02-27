@@ -71,9 +71,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/index.html'
     }),
-    new webpack.DefinePlugin({
-      'process.env.REACT_APP_SERVER_URL': JSON.stringify(process.env.REACT_APP_SERVER_URL || 'http://localhost:5000')
-    }),
   ],
   devServer: {
     port: 3000,
