@@ -26,14 +26,15 @@ module.exports = {
             loader: 'css-loader',
             options: {
               modules: true,
-            }
+            },
           },
           {
             loader: 'sass-loader',
             options: {
-              additionalData: `@use "styles/variables";`,
               sassOptions: {
-                includePaths: [__dirname, 'src']
+                includePaths: [
+                  path.resolve(__dirname, 'src')
+                ]
               }
             }
           },
@@ -48,13 +49,21 @@ module.exports = {
           {
             loader: 'sass-loader',
             options: {
-              additionalData: `@use "styles/variables";`,
               sassOptions: {
-                includePaths: [__dirname, 'src']
+                includePaths: [
+                  path.resolve(__dirname, 'src')
+                ]
               }
             }
           }
         ]
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        type: 'asset/resource',
+        generator: {
+          filename: 'images/[hash][ext][query]'
+        }
       },
     ]
   },
@@ -65,6 +74,7 @@ module.exports = {
   ],
   devServer: {
     port: 3000,
-    open: true
+    open: true,
+    hot: true,
   }
 };
