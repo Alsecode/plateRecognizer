@@ -1,20 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.scss';
 import FileUpload from './components/FileUpload/FileUpload';
 import ButtonCommon from './components/ButtonCommon/ButtonCommon';
 import logo from './img/logo.png';
 import PlateAnswer from './components/PlateAnswer/PlateAnswer';
+import CameraShot from './components/CameraShot/CameraShot';
 
 const SERVER_URL = 'http://localhost:5000';
 
 interface ResponseData {
-  results: {
-    plate: string,
-    region: {
-      code: string,
-    }
-  }[]
-}
+  plateRecognition: {
+    results: {
+      plate: string,
+      region: {
+        code: string,
+      }
+    }[]
+  },
+  distanceEstimation: number
+};
 
 interface AnswerItem {
   plate: string;
@@ -31,17 +35,40 @@ const App = () => {
 
   // Ответ
   const [answer, setAnswer] = useState<AnswerItem[] | null>(null);
+
+  // Расстояние
+  const [dist, setDist] = useState<number>(0);
+
   // Текст возникшей ошибки
   const [error, setError] = useState<string>('');
 
+
+  const [userLocation, setUserLocation] = useState(null);
+
+  useEffect(() => {
+
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+
+        const { latitude, longitude } = position.coords;
+        console.log({ latitude, longitude })
+        setUserLocation({ latitude, longitude });
+        console.log(userLocation);
+      },
+      (error) => {
+          // display an error if we cant get the users position
+          console.error('Error getting user location:', error);
+      }
+  );
+  }, [])
+
   // Обработчик изменения файла
-  const handleChangeFile = (file: File) => {
-    // Обнуляем предыдущий ответ и ошибку
+  const handleChangeFile = async (file: File) => {
     setAnswer(null);
     setError('');
 
     setFile(file);
-    // Кнопка становится разблокированной
     setDisabled(false);
   }
 
@@ -63,11 +90,19 @@ const App = () => {
         method: 'POST',
         body: formData,
       });
-      const { results }: ResponseData = await res.json();
-      const formattedResult = results.map(result => 
+
+      const result: ResponseData = await res.json();
+      console.log(result);
+      
+      const formattedResult = result.plateRecognition.results.map(result => 
         ({ plate: result.plate, region: result.region.code })
       );
-      formattedResult.length ? setAnswer(formattedResult) : setError('К сожалению не удалось определить номер. Попробуйте другую фотографию');
+      if (formattedResult.length) {
+        setAnswer(formattedResult);
+        setDist(result.distanceEstimation);
+      } else {
+        setError('К сожалению не удалось определить номер. Попробуйте другую фотографию');
+      }
     } catch (error) {
       console.error(error);
       setError('Произошла ошибка при отправке файла');
@@ -95,6 +130,15 @@ const App = () => {
           </div>
         ) : null}
         {error ? <p className="plate-error">{error}</p> : null}
+        {userLocation ?
+          <div>Геопозиция
+          <p>Широта: {userLocation.latitude}</p>
+          <p>Долгота: {userLocation.longitude}</p>
+          </div>
+          : null }
+        {dist ?
+          <p>Расстояние: {dist.toFixed(3)} метр</p>
+        : null}
       </main>
     </div>
   );
