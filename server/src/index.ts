@@ -9,7 +9,7 @@ import { UploadRequest } from './controllers/types/upload.types';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
 
 const upload = multer({ dest: 'uploads/' });
 
@@ -31,6 +31,6 @@ app.post(
   }
 );
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`Сервер запущен на порту ${port}`);
 });
