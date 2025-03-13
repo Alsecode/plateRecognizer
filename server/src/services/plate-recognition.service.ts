@@ -1,15 +1,16 @@
 import axios from 'axios';
 import FormData from 'form-data';
-import fs from 'fs';
 import { ENV } from '../config/env';
 import { PlateRecognitionResult } from './types/recognition.types';
 
-// Вычисление номера машины
-export const processPlateRecognition = async (filePath: string): Promise<PlateRecognitionResult> => {
+// Распознавание номера по внешнему API
+export const processPlateRecognition = async (fileBuffer: Buffer): Promise<PlateRecognitionResult> => {
+  // Создание формы с картинкой
   const formData = new FormData();
-  formData.append('upload', fs.createReadStream(filePath));
-
-  console.log(ENV.PLATE_RECOGNIZER_TOKEN);
+  formData.append('upload', fileBuffer, {
+    filename: 'image.jpg',
+    contentType: 'image/jpeg'
+  });
 
   const response = await axios.post(
     'https://api.platerecognizer.com/v1/plate-reader/',
@@ -21,6 +22,5 @@ export const processPlateRecognition = async (filePath: string): Promise<PlateRe
       },
     }
   );
-
   return response.data;
 }

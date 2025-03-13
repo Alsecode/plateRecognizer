@@ -4,9 +4,9 @@ import FileUpload from './components/FileUpload/FileUpload';
 import ButtonCommon from './components/ButtonCommon/ButtonCommon';
 import logo from './img/logo.png';
 import PlateAnswer from './components/PlateAnswer/PlateAnswer';
-import CameraShot from './components/CameraShot/CameraShot';
+import LiveDistanceTracker from './components/LiveDistanceTracker/LiveDistanceTracker';
 
-const SERVER_URL = 'http://localhost:5000';
+const SERVER_URL = 'https://81a76c27b675b25154206762d515561e.serveo.net';
 
 interface ResponseData {
   plateRecognition: {
@@ -17,12 +17,16 @@ interface ResponseData {
       }
     }[]
   },
-  distanceEstimation: number
 };
 
 interface AnswerItem {
   plate: string;
   region: string;
+}
+
+interface ILocation {
+  latitude: number;
+  longitude: number;
 }
 
 const App = () => {
@@ -36,54 +40,45 @@ const App = () => {
   // Ответ
   const [answer, setAnswer] = useState<AnswerItem[] | null>(null);
 
-  // Расстояние
-  const [dist, setDist] = useState<number>(0);
-
   // Текст возникшей ошибки
   const [error, setError] = useState<string>('');
 
+  // Текущая геопозиция (при загрузке)
+  const [userLocation, setUserLocation] = useState<ILocation | null>(null);
 
-  const [userLocation, setUserLocation] = useState(null);
+  // Стартовая геопозиция (когда фотография успешно распознана)
+  const [startLocation, setStartLocation] = useState<ILocation | null>(null);
 
-  useEffect(() => {
+  // При первом рендере получаем геолокацию (без наблюдения)
 
-    
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-
-        const { latitude, longitude } = position.coords;
-        console.log({ latitude, longitude })
-        setUserLocation({ latitude, longitude });
-        console.log(userLocation);
-      },
-      (error) => {
-          // display an error if we cant get the users position
-          console.error('Error getting user location:', error);
-      }
-  );
-  }, [])
 
   // Обработчик изменения файла
   const handleChangeFile = async (file: File) => {
     setAnswer(null);
     setError('');
-
     setFile(file);
     setDisabled(false);
   }
 
+  // Обработчик определения номера
   const handleClick = async () => {
     // Установка кнопки активной и заблокированной во время запроса
     setActive(true);
     setDisabled(true);
 
-    // Обнуляем предыдущий ответ и ошибку
+    // Обнуление предыдущего ответа и ошибки
     setAnswer(null);
     setError('');
 
+    // Обнуление геолокации
+    setStartLocation(null);
+    setUserLocation(null);
+
     // Добавление файла изображения в форму
     const formData = new FormData();
-    formData.append('file', file);
+    if (file) {
+      formData.append('file', file);
+    }
 
     try {
       const res = await fetch(`${SERVER_URL}/api/upload`, {
@@ -92,14 +87,29 @@ const App = () => {
       });
 
       const result: ResponseData = await res.json();
-      console.log(result);
       
-      const formattedResult = result.plateRecognition.results.map(result => 
-        ({ plate: result.plate, region: result.region.code })
-      );
+      const formattedResult = result.plateRecognition.results.map(result => ({ 
+          plate: result.plate,
+          region: result.region.code
+      }));
+
       if (formattedResult.length) {
         setAnswer(formattedResult);
-        setDist(result.distanceEstimation);
+
+        // Установка стартовой позиции
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            const currentLocation = { latitude, longitude };
+
+            setUserLocation(currentLocation);
+            setStartLocation(currentLocation);
+          },
+          (error) => {
+            // Не удалось получить начальную позицию
+            console.error('Error getting user location:', error);
+          }
+        )
       } else {
         setError('К сожалению не удалось определить номер. Попробуйте другую фотографию');
       }
@@ -130,15 +140,9 @@ const App = () => {
           </div>
         ) : null}
         {error ? <p className="plate-error">{error}</p> : null}
-        {userLocation ?
-          <div>Геопозиция
-          <p>Широта: {userLocation.latitude}</p>
-          <p>Долгота: {userLocation.longitude}</p>
-          </div>
-          : null }
-        {dist ?
-          <p>Расстояние: {dist.toFixed(3)} метр</p>
-        : null}
+        {!error && startLocation && (
+          <LiveDistanceTracker startLocation={startLocation} />
+        )}
       </main>
     </div>
   );
