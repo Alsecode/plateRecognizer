@@ -6,7 +6,7 @@ import logo from './img/logo.png';
 import PlateAnswer from './components/PlateAnswer/PlateAnswer';
 import LiveDistanceTracker from './components/LiveDistanceTracker/LiveDistanceTracker';
 
-const SERVER_URL = 'https://81a76c27b675b25154206762d515561e.serveo.net';
+const SERVER_URL = 'https://platerecognizer-swt7.onrender.com';
 
 interface ResponseData {
   plateRecognition: {
