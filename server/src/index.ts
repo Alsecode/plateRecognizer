@@ -9,6 +9,8 @@ import { UploadRequest } from './controllers/types/upload.types';
 dotenv.config();
 
 const app = express();
+const port = process.env.PORT || 5000;
+
 const upload = multer({ dest: 'uploads/' });
 
 app.use(cors());
@@ -29,6 +31,6 @@ app.post(
   }
 );
 
-app.listen(ENV.PORT, () => {
-  console.log(`Сервер запущен на порту ${ENV.PORT}`);
+app.listen(port, () => {
+  console.log(`Сервер запущен на порту ${port}`);
 });
